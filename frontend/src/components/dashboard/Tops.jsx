@@ -46,7 +46,7 @@ const Tops = ({ tops }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <article>
                     <h3 className="text-xs font-semibold text-emerald-600 mb-3 uppercase tracking-wide">
-                        🚀 Advancers
+                        🚀 Gainers
                     </h3>
 
                     <div className="divide-y divide-gray-100">
@@ -67,7 +67,7 @@ const Tops = ({ tops }) => {
 
                 <article>
                     <h3 className="text-xs font-semibold text-rose-600 mb-3 uppercase tracking-wide">
-                        📉 Decliners
+                        📉 Losers
                     </h3>
 
                     <div className="divide-y divide-gray-100">

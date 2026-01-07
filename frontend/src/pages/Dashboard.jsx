@@ -6,6 +6,7 @@ import {getPortfolio, getDashboard} from '../services/api'
 import PortfolioSummaryCard from "../components/dashboard/PortfolioSummaryCard";
 import Tops from "../components/dashboard/Tops";
 import RecentNews from "../components/dashboard/RecentNews";
+import ActiveAlerts from "../components/dashboard/ActiveAlerts";
 
 const Dashboard = () => {
     const [portfolio, setPortfolio] = useState(null)
@@ -33,11 +34,10 @@ const Dashboard = () => {
     return (
         <div>
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-            <div className="bg-white p-6 rounded-lg shadow">
-                <PortfolioSummaryCard portfolio={portfolio}/>
-                <Tops tops={dashboard}/>
-                <RecentNews news={dashboard}/>
-            </div>
+            <PortfolioSummaryCard portfolio={portfolio}/>
+            <Tops tops={dashboard}/>
+            <RecentNews news={dashboard}/>
+            <ActiveAlerts alerts={dashboard?.activeAlerts}/>
         </div>
     )
 }
