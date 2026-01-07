@@ -36,7 +36,7 @@ const Tops = ({ tops }) => {
     } = tops || {}
 
     return (
-        <section className="bg-white rounded-2xl shadow p-5">
+        <section className="bg-white rounded-2xl shadow p-5 mb-5">
             <header className="mb-5">
                 <h2 className="text-base font-semibold text-gray-800">
                     Market Activity

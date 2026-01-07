@@ -5,10 +5,11 @@ import {useEffect, useState} from "react";
 import {getPortfolio, getDashboard} from '../services/api'
 import PortfolioSummaryCard from "../components/dashboard/PortfolioSummaryCard";
 import Tops from "../components/dashboard/Tops";
+import RecentNews from "../components/dashboard/RecentNews";
 
 const Dashboard = () => {
     const [portfolio, setPortfolio] = useState(null)
-    const [tops, setTops] = useState(null)
+    const [dashboard, setDashboard] = useState(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -18,11 +19,12 @@ const Dashboard = () => {
 
             res = await getDashboard();
             if (!res?.data?.success) throw new Error('API error')
-            const topsData = res.data.data;
+            const dashboardData = res.data.data;
+
             // pause for the skeleton
             setInterval(() => {
                 setPortfolio(portfolioData);
-                setTops(topsData);
+                setDashboard(dashboardData);
             }, 500);
         }
         fetchData()
@@ -33,7 +35,8 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
             <div className="bg-white p-6 rounded-lg shadow">
                 <PortfolioSummaryCard portfolio={portfolio}/>
-                <Tops tops={tops}/>
+                <Tops tops={dashboard}/>
+                <RecentNews news={dashboard}/>
             </div>
         </div>
     )
