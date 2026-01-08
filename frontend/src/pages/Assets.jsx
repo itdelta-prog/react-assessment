@@ -10,6 +10,15 @@ import ChangeCell from "../components/Table/Cell/ChangeCell";
 import {XIcon} from "@heroicons/react/solid";
 import ColumnCurrencyRangeFilter from "../components/Table/Filters/ColumnCurrencyRangeFilter";
 
+
+// Hello boss! :)
+// I use the component Table1 (TanStack Table 7)  from my another project, so it has some extra code
+// Also I changed the fetching to getAssets func for filtering and pagination on the backend side
+// Usually I use filters at the column heads, but Symbol and Name fields cam be filtered only with the "search" query parameter (and it's string type) on the backend,
+//   so I make the both head filters hidden.
+// Other filters are implemented
+// Also implemented the sorting
+
 const Assets = () => {
     const [searchFilter, setSearchFilter] = useState();
 
