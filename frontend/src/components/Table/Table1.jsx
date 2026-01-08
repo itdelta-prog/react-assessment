@@ -5,16 +5,12 @@ import React, {
   useCallback,
   useRef,
   useMemo,
-  useContext,
-  Suspense,
 } from "react";
-import axios from "axios";
 import {
   useTable,
   useSortBy,
   usePagination,
   useFilters,
-  useGlobalFilter,
   useRowSelect,
   useResizeColumns,
   useFlexLayout,
@@ -30,16 +26,9 @@ import {
   CogIcon
 } from "@heroicons/react/outline";
 import { useTranslation } from "react-i18next";
-// import { CSSTransition } from "react-transition-group";
 import { Listbox, Transition } from "@headlessui/react";
 import LoadingSpinner from "../LoadingSpinner";
-import ColumnFilter from "./ColumnFilter.jsx";
-// import { FilterButton } from "../AdminPages/Page";
-// import SelectionActions from './Components/SelectionActions.jsx'
-// import { usePage } from "@inertiajs/react";
-// import ColumnSettingsModal from "../Modals/ColumnSettingsModal.jsx";
-
-
+import ColumnFilter from "./Filters/ColumnFilter.jsx";
 
 export default function Table1({
   columns,
@@ -52,6 +41,7 @@ export default function Table1({
   defaultSortDesc = true, //prop for managing the sorting state
   tableFiltersExpanded = true, // show filters opened
   topFilters, // additional filters above the table
+  fetchData,
   ...props
 }) {
   const { t } = useTranslation(["common", "table"]);
@@ -116,21 +106,6 @@ export default function Table1({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-    // options: {
-    //   showGlobalFilter = false,
-    //   showColumnSelection = false,
-    //   showElementsPerPage = true,
-    //   showGoToPage = false,
-    //   showPagination = true,
-    //   showRowCheckboxes = false,
-    // } = {
-    //   showGlobalFilter,
-    //   showColumnSelection,
-    //   showElementsPerPage,
-    //   showGoToPage,
-    //   showPagination,
-    //   showRowCheckboxes,
-    // },
     showFilter = false,
     pageSizes = null,
     manualSortBy = true,
@@ -173,18 +148,6 @@ export default function Table1({
       showOverflow: true
     }), []
   )
-  const handleApply = ({ hiddenColumnIds, columnOrder }) => {
-    window.localStorage.setItem("hiddenColumns_" + window.location.pathname, JSON.stringify(hiddenColumnIds)); //window?
-    localStorage.setItem("columnOrder_" + window.location.pathname, JSON.stringify(columnOrder));
-
-    setHiddenColumns(['selection', ...hiddenColumnIds]);
-    setColumnOrder(columnOrder);
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
 
   const IndeterminateCheckbox = React.forwardRef(
     ({ indeterminate, ...rest }, ref) => {
@@ -291,55 +254,19 @@ export default function Table1({
     sortDir: state.sortBy[0]?.desc ? "desc" : "asc",
   });
 
-  const fetchData = ({ pageIndex, pageSize, filters, sorting }) => {
-      const sortBy = sorting?.sortBy ?? "";
-      const sortDir = sorting?.sortDir ?? "";
-
-      let filtersCombined = [...filters, ...(topFilters ?? [])];
-
-      const filtersArr = filtersCombined
-        .map((n) => {
-          if (Array.isArray(n.value)) {
-            // Для множественного выбора формируем filters[id][] для каждого элемента
-            return n.value
-              .map(
-                (v) =>
-                  `filters[${encodeURIComponent(n.id)}][]=${encodeURIComponent(v)}`,
-              )
-              .join('&');
-          }
-          // Обычные фильтры оставляем без изменений
-          return `filters[${encodeURIComponent(n.id)}]=${encodeURIComponent(
-            n.value,
-          )}`;
-        })
-        .join('&');
-
-      const url = location.origin + location.pathname;
-      axios
-        .get(`${url}?page=${pageIndex}&perpage=${pageSize}&sortby=${encodeURIComponent(sortBy) ?? ""}&sortdir=${sortDir ?? ""}&${filtersArr}`)
-        .then((resp) => {
-          setTotal(resp.data.total);
-          setControlledPageCount(resp.data.last_page);
-          setData(addActions(resp.data.data));
-        })
-        .finally(() => setLoading(false));
-    };
-
   // fetching data
   useEffect(() => {
     if (dataValue == null && loading !== true) {
       setLoading(true);
-      props.fetchData({ pageIndex: pageIndex + 1, pageSize, filters, sorting })
+      fetchData({ pageIndex: pageIndex + 1, pageSize, filters, sorting })
           .then(resp => {
-            setTotal(resp.count);
-            setControlledPageCount(1);
-            setData(resp);
+            setTotal(resp.data.pagination.totalItems);
+            setControlledPageCount(resp.data.pagination.totalPages);
+            setData(resp.data.data);
           })
           .finally(() => setLoading(false));
     }
     window.localStorage.setItem("pageSize_" + window.location.pathname, pageSize);
-    window.localStorage.setItem("pageIndex_" + window.location.pathname, pageIndex);
     window.localStorage.setItem("filters_" + window.location.pathname, JSON.stringify(filters));
 
   }, [pageSize, pageIndex, filters, sorting, refresh, topFilters]);
@@ -371,10 +298,7 @@ export default function Table1({
       return <SortAscendingIcon className={className} />;
     }
 
-    if (column.disableFilters !== true) {
-      return <SelectorIcon className={`${className} text-gray-300`} />;
-    }
-    return null;
+    return <SelectorIcon className={`${className} text-gray-300`} />;
   }, []);
 
   const Pagination = useCallback(() => {
@@ -400,9 +324,9 @@ export default function Table1({
       const getLocalizedNumberOfElements = (number) => {
         return getNoun(
           number,
-          t("common:element1"),
-          t("common:element3"),
-          t("common:element10")
+          'element',
+            'elements',
+            'elements',
         );
       };
 
@@ -423,7 +347,7 @@ export default function Table1({
                 >
                   <span className="block truncate">
                     {`${t(
-                      "common:show"
+                      "Show"
                     )} ${pageSize} ${getLocalizedNumberOfElements(pageSize)}`}
                   </span>
                   <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -462,7 +386,7 @@ export default function Table1({
                               } block truncate text-xs'`}
                             >
                               {`${t(
-                                "common:show"
+                                "Show"
                               )} ${pSize} ${getLocalizedNumberOfElements(
                                 pSize
                               )}`}
@@ -652,7 +576,7 @@ export default function Table1({
                                   : ""
                               } flex items-center`}
                               style={{width: '100%'}}
-                              {...(column.disableFilters
+                              {...(column.disableSortBy
                                 ? null
                                 : getSortByToggleProps)}
                               title={t("table:ToggleSortBy")}

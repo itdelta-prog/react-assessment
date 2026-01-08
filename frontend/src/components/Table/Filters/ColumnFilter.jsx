@@ -7,7 +7,7 @@ function classNames(...classes) {
 }
 
 export default function ColumnFilter({column}) {
-    const {filterValue, setFilter} = column;
+    const {filterValue, setFilter, placeholder} = column;
 
     return (
         <>
@@ -15,7 +15,7 @@ export default function ColumnFilter({column}) {
             <input
                 type="text"
                 value={filterValue || ''}
-                // placeholder='search...'
+                placeholder={placeholder}
                 onChange={(e) =>
                     startTransition(() => setFilter(e.target.value || undefined))
                 }

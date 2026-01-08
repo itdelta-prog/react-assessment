@@ -9,6 +9,8 @@ const api = axios.create({
   },
 })
 
+export const getAssets = (query) => api.get('/assets' + query)
+
 export const getStocks = () => api.get('/stocks')
 export const getStock = (symbol) => api.get(`/stocks/${symbol}`)
 export const getCrypto = () => api.get('/crypto')

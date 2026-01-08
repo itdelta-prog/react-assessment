@@ -13,6 +13,7 @@
     "react-table": "^7.7.0",
     "@heroicons/react": "^1.0.6",
     "@headlessui/react": "^1.4.2",
+    "@siberiacancode/reactuse": "^0.0.110",
     "react-i18next": "^15.4.1"
   },
   "devDependencies": {

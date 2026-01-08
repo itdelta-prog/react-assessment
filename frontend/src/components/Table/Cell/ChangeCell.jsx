@@ -1,7 +1,7 @@
 import React from "react";
 
 const ChangeCell = ({value}) => {
-  const directionFlag = value < 0;
+  const directionFlag = value > 0;
   return (
       <div
           className={`text-xs font-medium ${
